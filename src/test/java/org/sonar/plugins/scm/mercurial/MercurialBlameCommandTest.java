@@ -87,6 +87,7 @@ public class MercurialBlameCommandTest {
         outConsumer.consumeLine("Julien Henry <julien.henry@sonarsource.com> d45dafac0d9a Tue Nov 04 11:01:10 2014 +0100: foo");
         outConsumer.consumeLine("Julien Henry <julien.henry@sonarsource.com> d45dafac0d9a Tue Nov 04 11:01:10 2014 +0100: ");
         outConsumer.consumeLine("Julien Henry <julien.henry@sonarsource.com> d45dafac0d9a Tue Nov 04 11:01:10 2014 +0100: bar");
+        outConsumer.consumeLine("julien.henry d45dafac0d9b Tue Nov 04 11:01:10 2014 +0100: baz");
         return 0;
       }
     });
@@ -96,7 +97,8 @@ public class MercurialBlameCommandTest {
     verify(result).blameResult(inputFile,
       Arrays.asList(new BlameLine().date(DateUtils.parseDateTime("2014-11-04T11:01:10+0100")).revision("d45dafac0d9a").author("julien.henry@sonarsource.com"),
         new BlameLine().date(DateUtils.parseDateTime("2014-11-04T11:01:10+0100")).revision("d45dafac0d9a").author("julien.henry@sonarsource.com"),
-        new BlameLine().date(DateUtils.parseDateTime("2014-11-04T11:01:10+0100")).revision("d45dafac0d9a").author("julien.henry@sonarsource.com")));
+        new BlameLine().date(DateUtils.parseDateTime("2014-11-04T11:01:10+0100")).revision("d45dafac0d9a").author("julien.henry@sonarsource.com"),
+        new BlameLine().date(DateUtils.parseDateTime("2014-11-04T11:01:10+0100")).revision("d45dafac0d9b").author("julien.henry")));
   }
 
   @Test

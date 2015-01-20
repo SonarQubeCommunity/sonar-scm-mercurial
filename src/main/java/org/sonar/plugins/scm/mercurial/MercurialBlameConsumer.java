@@ -39,7 +39,7 @@ public class MercurialBlameConsumer implements StreamConsumer {
   private static final Logger LOG = LoggerFactory.getLogger(MercurialBlameConsumer.class);
 
   private static final String HG_TIMESTAMP_PATTERN = "EEE MMM dd HH:mm:ss yyyy Z";
-  private static final String HG_BLAME_PATTERN = ".* <(.*)> ([0-9a-f]+) (.*):.*";
+  private static final String HG_BLAME_PATTERN = "(.*?) (?:<(.*)> )?([0-9a-f]+) (.*):.*";
 
   private List<BlameLine> lines = new ArrayList<BlameLine>();
 
@@ -58,17 +58,22 @@ public class MercurialBlameConsumer implements StreamConsumer {
   @Override
   public void consumeLine(String line) {
     String trimmedLine = line.trim();
-    /* godin <email> 0 Sun Jan 31 03:04:54 2010 +0300 */
+    /* godin <email> 0 Sun Jan 31 03:04:54 2010 +0300: */
+    /* godin 0 Sun Jan 31 03:04:54 2010 +0300: */
     Matcher matcher = pattern.matcher(trimmedLine);
     if (!matcher.matches()) {
       throw new IllegalStateException("Unable to blame file " + filename + ". Unrecognized blame info at line " + (getLines().size() + 1) + ": " + trimmedLine);
     }
-    String authorEmail = matcher.group(1);
-    String revision = matcher.group(2);
-    String dateStr = matcher.group(3);
+    String author = matcher.group(2);
+    if (author == null)
+    {
+        author = matcher.group(1);
+    }
+    String revision = matcher.group(3);
+    String dateStr = matcher.group(4);
     Date dateTime = parseDate(dateStr);
 
-    lines.add(new BlameLine().date(dateTime).revision(revision).author(authorEmail));
+    lines.add(new BlameLine().date(dateTime).revision(revision).author(author));
   }
 
   /**
