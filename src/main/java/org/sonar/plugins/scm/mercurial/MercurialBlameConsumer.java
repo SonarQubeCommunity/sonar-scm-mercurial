@@ -65,9 +65,8 @@ public class MercurialBlameConsumer implements StreamConsumer {
       throw new IllegalStateException("Unable to blame file " + filename + ". Unrecognized blame info at line " + (getLines().size() + 1) + ": " + trimmedLine);
     }
     String author = matcher.group(2);
-    if (author == null)
-    {
-        author = matcher.group(1);
+    if (author == null) {
+      author = matcher.group(1);
     }
     String revision = matcher.group(3);
     String dateStr = matcher.group(4);
