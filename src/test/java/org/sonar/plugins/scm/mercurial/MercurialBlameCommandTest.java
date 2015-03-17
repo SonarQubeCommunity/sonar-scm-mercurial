@@ -134,7 +134,7 @@ public class MercurialBlameCommandTest {
   }
 
   @Test
-  public void shouldFailOnFileUncommitted() throws IOException {
+  public void shouldNotFailOnFileUncommitted() throws IOException {
     File source = new File(baseDir, "src/foo.xoo");
     FileUtils.write(source, "sample content");
     DefaultInputFile inputFile = new DefaultInputFile("foo", "src/foo.xoo").setAbsolutePath(new File(baseDir, "src/foo.xoo").getAbsolutePath());
@@ -153,11 +153,11 @@ public class MercurialBlameCommandTest {
       }
     });
 
-    thrown.expect(IllegalStateException.class);
-    thrown.expectMessage("The mercurial blame command [hg blame -w -v --user --date --changeset src/foo.xoo] failed: abandon : src/foo.xoo: no such file in rev 000000000000");
-
     when(input.filesToBlame()).thenReturn(Arrays.<InputFile>asList(inputFile));
     new MercurialBlameCommand(commandExecutor).blame(input, result);
+
+    // TODO assert log contains
+    // "The mercurial blame command [hg blame -w -v --user --date --changeset src/foo.xoo] failed: abandon : src/foo.xoo: no such file in rev 000000000000"
   }
 
 }

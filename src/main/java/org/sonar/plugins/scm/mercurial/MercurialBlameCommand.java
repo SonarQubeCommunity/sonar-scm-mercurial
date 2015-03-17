@@ -33,11 +33,7 @@ import org.sonar.api.utils.command.StringStreamConsumer;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 public class MercurialBlameCommand extends BlameCommand {
 
@@ -93,7 +89,8 @@ public class MercurialBlameCommand extends BlameCommand {
 
     int exitCode = execute(cl, consumer, stderr);
     if (exitCode != 0) {
-      throw new IllegalStateException("The mercurial blame command [" + cl.toString() + "] failed: " + stderr.getOutput());
+      // Ignore the error since it may be caused by uncommited file
+      LOG.debug("The mercurial blame command [" + cl.toString() + "] failed: " + stderr.getOutput());
     }
     List<BlameLine> lines = consumer.getLines();
     if (lines.size() == inputFile.lines() - 1) {
