@@ -39,7 +39,7 @@ public class MercurialBlameConsumer implements StreamConsumer {
   private static final Logger LOG = LoggerFactory.getLogger(MercurialBlameConsumer.class);
 
   private static final String HG_TIMESTAMP_PATTERN = "EEE MMM dd HH:mm:ss yyyy Z";
-  private static final String HG_BLAME_PATTERN = "(.*?) (?:<(.*)> )?([0-9a-f]+) (.*):.*";
+  private static final String HG_BLAME_PATTERN = "(.*?) (?:<(.*)> )?([0-9a-f]+) ([^:]+:[^:]+:[^:]+):.*";
 
   private List<BlameLine> lines = new ArrayList<BlameLine>();
 
@@ -70,25 +70,16 @@ public class MercurialBlameConsumer implements StreamConsumer {
     }
     String revision = matcher.group(3);
     String dateStr = matcher.group(4);
-    Date dateTime = parseDate(dateStr);
-
-    lines.add(new BlameLine().date(dateTime).revision(revision).author(author));
-  }
-
-  /**
-   * Converts the date timestamp from the output into a date object.
-   *
-   * @return A date representing the timestamp of the log entry.
-   */
-  protected Date parseDate(String date) {
+    Date dateTime = null;
     try {
-      return format.parse(date);
+      dateTime = format.parse(dateStr);
     } catch (ParseException e) {
       LOG.warn(
-        "skip ParseException: " + e.getMessage() + " during parsing date " + date
-          + " with pattern " + HG_TIMESTAMP_PATTERN + " with Locale " + Locale.ENGLISH, e);
-      return null;
+        "skip ParseException on file " + filename + " at line " + (getLines().size() + 1) + ": " + e.getMessage() + " during parsing date " + dateStr
+          + " with pattern " + HG_TIMESTAMP_PATTERN + " [" + line + "]", e);
     }
+
+    lines.add(new BlameLine().date(dateTime).revision(revision).author(author));
   }
 
   public List<BlameLine> getLines() {
