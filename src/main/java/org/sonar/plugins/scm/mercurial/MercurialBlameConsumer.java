@@ -39,7 +39,7 @@ public class MercurialBlameConsumer implements StreamConsumer {
   private static final Logger LOG = LoggerFactory.getLogger(MercurialBlameConsumer.class);
 
   private static final String HG_TIMESTAMP_PATTERN = "EEE MMM dd HH:mm:ss yyyy Z";
-  private static final String HG_BLAME_PATTERN = "(.*?) (?:<(.*)> )?([0-9a-f]+) ([^:]+:[^:]+:[^:]+):.*";
+  private static final String HG_BLAME_PATTERN = "(.*?) (?:<(.*)> )?([0-9a-f]{12}) ([^:]+:[^:]+:[^:]+):.*";
 
   private List<BlameLine> lines = new ArrayList<BlameLine>();
 
