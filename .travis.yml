@@ -5,6 +5,11 @@ install: true
 jdk:
   - oraclejdk7
 
+addons:
+  apt:
+    packages:
+    - mercurial 
+
 script:
   - hg --version
   - ./travis.sh
