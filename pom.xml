@@ -2,10 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.codehaus.sonar-plugins</groupId>
+    <groupId>org.sonarsource.parent</groupId>
     <artifactId>parent</artifactId>
-    <version>19</version>
+    <version>23</version>
+    <relativePath />
   </parent>
+  <groupId>org.sonarsource.scm.mercurial</groupId>
   <artifactId>sonar-scm-mercurial-plugin</artifactId>
   <name>SonarQube :: Plugins :: SCM :: Mercurial</name>
   <version>1.2-SNAPSHOT</version>
@@ -39,17 +41,16 @@
     <connection>scm:git:git@github.com:SonarCommunity/sonar-scm-mercurial.git</connection>
     <developerConnection>scm:git:git@github.com:SonarCommunity/sonar-scm-mercurial.git</developerConnection>
     <url>https://github.com/SonarCommunity/sonar-scm-mercurial</url>
-    <tag>HEAD</tag>
   </scm>
   
   <issueManagement>
     <system>jira</system>
-    <url>http://jira.codehaus.org/browse/SONARSCMER</url>
+    <url>https://jira.sonarsource.com/browse/SONARSCMER</url>
   </issueManagement>
   
   <ciManagement>
-    <system>Cloudbees</system>
-    <url>https://sonarplugins.ci.cloudbees.com/job/scm-mercurial/</url>
+    <system>Travis</system>
+    <url>https://travis-ci.org/SonarCommunity/sonar-scm-mercurial/</url>
   </ciManagement>
 
   <properties>
@@ -74,22 +75,27 @@
 
     <!-- unit tests -->
     <dependency>
-      <groupId>org.codehaus.sonar</groupId>
-      <artifactId>sonar-testing-harness</artifactId>
-      <version>${sonar.buildVersion}</version>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>2.1.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>1.9.5</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
       <version>1.7.10</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <version>1.9.5</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

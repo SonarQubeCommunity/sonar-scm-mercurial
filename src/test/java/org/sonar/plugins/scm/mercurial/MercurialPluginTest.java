@@ -1,7 +1,7 @@
 /*
  * SonarQube :: Plugins :: SCM :: Mercurial
  * Copyright (C) 2014 SonarSource
- * dev@sonar.codehaus.org
+ * sonarqube@googlegroups.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,10 +19,9 @@
  */
 package org.sonar.plugins.scm.mercurial;
 
-import org.sonar.plugins.scm.mercurial.MercurialPlugin;
-
 import org.junit.Test;
-import static org.fest.assertions.Assertions.assertThat;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class MercurialPluginTest {
 
