@@ -19,33 +19,39 @@
  */
 package org.sonar.plugins.scm.mercurial;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.scm.BlameCommand;
 import org.sonar.api.batch.scm.BlameLine;
+import org.sonar.api.config.Settings;
 import org.sonar.api.utils.command.Command;
 import org.sonar.api.utils.command.CommandExecutor;
 import org.sonar.api.utils.command.StreamConsumer;
 import org.sonar.api.utils.command.StringStreamConsumer;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.*;
-
 public class MercurialBlameCommand extends BlameCommand {
 
   private static final Logger LOG = LoggerFactory.getLogger(MercurialBlameCommand.class);
   private final CommandExecutor commandExecutor;
+  private Settings settings;
 
-  public MercurialBlameCommand() {
-    this(CommandExecutor.create());
+  public MercurialBlameCommand(Settings settings) {
+    this(CommandExecutor.create(), settings);
   }
 
-  MercurialBlameCommand(CommandExecutor commandExecutor) {
+  MercurialBlameCommand(CommandExecutor commandExecutor, Settings settings) {
     this.commandExecutor = commandExecutor;
+    this.settings = settings;
   }
 
   @Override
@@ -109,8 +115,11 @@ public class MercurialBlameCommand extends BlameCommand {
     Command cl = Command.create("hg");
     cl.setDirectory(workingDirectory);
     cl.addArgument("blame");
-    // Ignore whitespaces
-    cl.addArgument("-w");
+    // Hack to support Mercurial prior to 2.1
+    if (!settings.getBoolean("sonar.mercurial.considerWhitespaces")) {
+      // Ignore whitespaces
+      cl.addArgument("-w");
+    }
     // Verbose to have user email adress
     cl.addArgument("-v");
     // list the author

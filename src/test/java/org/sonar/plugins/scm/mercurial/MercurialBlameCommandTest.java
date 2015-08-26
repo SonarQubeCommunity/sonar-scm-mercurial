@@ -19,6 +19,9 @@
  */
 package org.sonar.plugins.scm.mercurial;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Rule;
@@ -33,14 +36,11 @@ import org.sonar.api.batch.fs.internal.DefaultInputFile;
 import org.sonar.api.batch.scm.BlameCommand.BlameInput;
 import org.sonar.api.batch.scm.BlameCommand.BlameOutput;
 import org.sonar.api.batch.scm.BlameLine;
+import org.sonar.api.config.Settings;
 import org.sonar.api.utils.DateUtils;
 import org.sonar.api.utils.command.Command;
 import org.sonar.api.utils.command.CommandExecutor;
 import org.sonar.api.utils.command.StreamConsumer;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
@@ -95,7 +95,7 @@ public class MercurialBlameCommandTest {
     });
 
     when(input.filesToBlame()).thenReturn(Arrays.<InputFile>asList(inputFile));
-    new MercurialBlameCommand(commandExecutor).blame(input, result);
+    new MercurialBlameCommand(commandExecutor, new Settings()).blame(input, result);
     verify(result).blameResult(inputFile,
       Arrays.asList(new BlameLine().date(DateUtils.parseDateTime("2014-11-04T11:01:10+0100")).revision("d45dafac0d9a").author("julien.henry@sonarsource.com"),
         new BlameLine().date(DateUtils.parseDateTime("2014-11-04T11:01:10+0100")).revision("d45dafac0d9a").author("julien.henry@sonarsource.com"),
@@ -129,7 +129,7 @@ public class MercurialBlameCommandTest {
     });
 
     when(input.filesToBlame()).thenReturn(Arrays.<InputFile>asList(inputFile));
-    new MercurialBlameCommand(commandExecutor).blame(input, result);
+    new MercurialBlameCommand(commandExecutor, new Settings()).blame(input, result);
     verify(result).blameResult(inputFile,
       Arrays.asList(new BlameLine().date(DateUtils.parseDateTime("2014-11-04T11:01:10+0100")).revision("d45dafac0d9a").author("julien.henry@sonarsource.com"),
         new BlameLine().date(DateUtils.parseDateTime("2014-11-04T11:01:10+0100")).revision("d45dafac0d9a").author("julien.henry@sonarsource.com"),
@@ -158,10 +158,11 @@ public class MercurialBlameCommandTest {
     });
 
     when(input.filesToBlame()).thenReturn(Arrays.<InputFile>asList(inputFile));
-    new MercurialBlameCommand(commandExecutor).blame(input, result);
+    new MercurialBlameCommand(commandExecutor, new Settings()).blame(input, result);
 
     // TODO assert log contains
-    // "The mercurial blame command [hg blame -w -v --user --date --changeset src/foo.xoo] failed: abandon : src/foo.xoo: no such file in rev 000000000000"
+    // "The mercurial blame command [hg blame -w -v --user --date --changeset src/foo.xoo] failed: abandon : src/foo.xoo: no such file in
+    // rev 000000000000"
   }
 
 }

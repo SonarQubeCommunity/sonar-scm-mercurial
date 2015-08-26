@@ -104,6 +104,10 @@ public class MercurialTest {
     MavenBuild sonar = MavenBuild.create(pom)
       .setGoals("clean verify sonar:sonar")
       .setProperty("sonar.junit.reportsPath", "");
+    // Hack for Travis that have Mercurial 2.0.2
+    if (System.getenv("TRAVIS") != null) {
+      sonar.setProperty("sonar.mercurial.considerWhitespaces", "true");
+    }
     orchestrator.executeBuilds(sonar);
 
     assertThat(getScmData("dummy-hg:dummy:src/main/java/org/dummy/Dummy.java"))
