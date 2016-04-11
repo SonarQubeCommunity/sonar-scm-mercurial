@@ -13,12 +13,10 @@ addons:
 script:
   - hg --version
   - ./travis.sh
-                                                                                                                                                                 
+
 env:                                                                                                                                                             
   matrix:                                                                                                                                                        
-    - RUN_ITS=false                                                                                                                                              
-    - RUN_ITS=true SQ_VERSION=5.0.1                                                                                                                                
-    - RUN_ITS=true SQ_VERSION=DEV
+    - TEST=CI
 
 cache:
   directories:
@@ -26,3 +24,6 @@ cache:
 
 notifications:
   email: false
+  webhooks:
+    - secure: "bCAnxqSxYujZcFSQZnhVLlaiPJv6mq6u+z/FPGWDRHmHG32/uHAeU+O/8aeZdWuQoSPskdxbIEcxjV7LO4UTKBr6Qolqqm+4EeCAE63p4ME6+N7BZzVcpCzHaRblcSPNmZA36jpNSyqb02atPi3hCHTow3vciJrJiiTG7xgMQ58="
+

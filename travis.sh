@@ -2,23 +2,23 @@
 
 set -euo pipefail
 
-function installTravisTools {
+function configureTravis {
   mkdir ~/.local
-  curl -sSL https://github.com/SonarSource/travis-utils/tarball/v25 | tar zx --strip-components 1 -C ~/.local                                                    
-  source ~/.local/bin/install                                                                                                                                    
-}                                                                                                                                                                
+  curl -sSL https://github.com/SonarSource/travis-utils/tarball/v27 | tar zx --strip-components 1 -C ~/.local
+  source ~/.local/bin/install
+}
+configureTravis
 
-mvn verify -B -e -V                                                                                                                                              
+case "$TEST" in
 
-if [ "${RUN_ITS}" == "true" ]
-then
-  installTravisTools
+CI)
+  regular_mvn_build_deploy_analyze
+  ;;
 
-  if [ "${SQ_VERSION}" == "DEV" ]
-  then
-    build_snapshot "SonarSource/sonarqube"
-  fi
 
-  cd its  
-  mvn -Dsonar.runtimeVersion=$SQ_VERSION -Dmaven.test.redirectTestOutputToFile=false verify
-fi
+*)
+  echo "Unexpected TEST mode: $TEST"
+  exit 1
+  ;;
+
+esac
