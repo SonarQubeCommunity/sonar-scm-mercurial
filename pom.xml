@@ -42,20 +42,20 @@
   </modules>
 
   <scm>
-    <connection>scm:git:git@github.com:SonarSource/sonar-scm-mercurial.git</connection>
-    <developerConnection>scm:git:git@github.com:SonarSource/sonar-scm-mercurial.git</developerConnection>
-    <url>https://github.com/SonarSource/sonar-scm-mercurial</url>
+    <connection>scm:git:git@github.com:SonarQubeCommunity/sonar-scm-mercurial.git</connection>
+    <developerConnection>scm:git:git@github.com:SonarQubeCommunity/sonar-scm-mercurial.git</developerConnection>
+    <url>https://github.com/SonarQubeCommunity/sonar-scm-mercurial</url>
     <tag>HEAD</tag>
   </scm>
   
   <issueManagement>
-    <system>jira</system>
-    <url>https://jira.sonarsource.com/browse/SONARSCMER</url>
+    <system>GitHub Issues</system>
+    <url>https://github.com/SonarQubeCommunity/sonar-scm-mercurial/issues</url>
   </issueManagement>
   
   <ciManagement>
     <system>Travis</system>
-    <url>https://travis-ci.org/SonarSource/sonar-scm-mercurial/</url>
+    <url>https://travis-ci.org/SonarQubeCommunity/sonar-scm-mercurial/</url>
   </ciManagement>
 
   <properties>
