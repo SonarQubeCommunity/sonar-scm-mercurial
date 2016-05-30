@@ -12,7 +12,7 @@ addons:
 
 script:
   - hg --version
-  - ./travis.sh
+  - mvn verify -B -e -V
 
 env:                                                                                                                                                             
   matrix:                                                                                                                                                        
@@ -24,6 +24,3 @@ cache:
 
 notifications:
   email: false
-  webhooks:
-    - secure: "bCAnxqSxYujZcFSQZnhVLlaiPJv6mq6u+z/FPGWDRHmHG32/uHAeU+O/8aeZdWuQoSPskdxbIEcxjV7LO4UTKBr6Qolqqm+4EeCAE63p4ME6+N7BZzVcpCzHaRblcSPNmZA36jpNSyqb02atPi3hCHTow3vciJrJiiTG7xgMQ58="
-
