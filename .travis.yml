@@ -14,10 +14,6 @@ script:
   - hg --version
   - mvn verify -B -e -V
 
-env:                                                                                                                                                             
-  matrix:                                                                                                                                                        
-    - TEST=CI
-
 cache:
   directories:
     - '$HOME/.m2/repository'
