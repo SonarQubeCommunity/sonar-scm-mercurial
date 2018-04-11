@@ -1,7 +1,7 @@
 /*
  * SonarQube :: Plugins :: SCM :: Mercurial
- * Copyright (C) 2014-2016 SonarSource SA
- * mailto:contact AT sonarsource DOT com
+ * Copyright (C) 2014-2018 SonarSource SA
+ * mailto:info AT sonarsource DOT com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,7 +26,9 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
+import static org.apache.commons.io.FileUtils.forceMkdir;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 public class MercurialScmProviderTest {
 
@@ -37,17 +39,21 @@ public class MercurialScmProviderTest {
 
   @Test
   public void sanityCheck() {
-    assertThat(new MercurialScmProvider(null).key()).isEqualTo("hg");
+    assertThat(new MercurialScmProvider(mockBlameCommand()).key()).isEqualTo("hg");
   }
 
   @Test
   public void testAutodetection() throws IOException {
     File baseDirEmpty = temp.newFolder();
-    assertThat(new MercurialScmProvider(null).supports(baseDirEmpty)).isFalse();
+    assertThat(new MercurialScmProvider(mockBlameCommand()).supports(baseDirEmpty)).isFalse();
 
     File tfsBaseDir = temp.newFolder();
-    new File(tfsBaseDir, ".hg").mkdir();
-    assertThat(new MercurialScmProvider(null).supports(tfsBaseDir)).isTrue();
+    forceMkdir(new File(tfsBaseDir, ".hg"));
+    assertThat(new MercurialScmProvider(mockBlameCommand()).supports(tfsBaseDir)).isTrue();
+  }
+
+  private static MercurialBlameCommand mockBlameCommand() {
+    return mock(MercurialBlameCommand.class);
   }
 
 }
