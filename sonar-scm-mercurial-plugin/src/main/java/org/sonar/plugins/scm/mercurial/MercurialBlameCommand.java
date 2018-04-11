@@ -1,7 +1,7 @@
 /*
  * SonarQube :: Plugins :: SCM :: Mercurial
- * Copyright (C) 2014-2016 SonarSource SA
- * mailto:contact AT sonarsource DOT com
+ * Copyright (C) 2014-2018 SonarSource SA
+ * mailto:info AT sonarsource DOT com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,6 +19,7 @@
  */
 package org.sonar.plugins.scm.mercurial;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +50,7 @@ public class MercurialBlameCommand extends BlameCommand {
     this(CommandExecutor.create(), settings);
   }
 
+  @VisibleForTesting
   MercurialBlameCommand(CommandExecutor commandExecutor, Settings settings) {
     this.commandExecutor = commandExecutor;
     this.settings = settings;
@@ -59,7 +61,7 @@ public class MercurialBlameCommand extends BlameCommand {
     FileSystem fs = input.fileSystem();
     LOG.debug("Working directory: " + fs.baseDir().getAbsolutePath());
     ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
-    List<Future<Void>> tasks = new ArrayList<Future<Void>>();
+    List<Future<Void>> tasks = new ArrayList<>();
     for (InputFile inputFile : input.filesToBlame()) {
       tasks.add(submitTask(fs, output, executorService, inputFile));
     }
@@ -106,7 +108,7 @@ public class MercurialBlameCommand extends BlameCommand {
     output.blameResult(inputFile, lines);
   }
 
-  public int execute(Command cl, StreamConsumer consumer, StreamConsumer stderr) {
+  private int execute(Command cl, StreamConsumer consumer, StreamConsumer stderr) {
     LOG.debug("Executing: " + cl);
     return commandExecutor.execute(cl, consumer, stderr, -1);
   }
