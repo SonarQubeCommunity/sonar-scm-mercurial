@@ -19,18 +19,12 @@
  */
 package org.sonar.plugins.scm.mercurial;
 
-import com.google.common.collect.ImmutableList;
-import org.sonar.api.SonarPlugin;
+import org.sonar.api.Plugin;
 
-import java.util.List;
-
-public final class MercurialPlugin extends SonarPlugin {
+public final class MercurialPlugin implements Plugin {
 
   @Override
-  public List getExtensions() {
-    return ImmutableList.of(
-      MercurialScmProvider.class,
-      MercurialBlameCommand.class);
+  public void define(Context context) {
+    context.addExtensions(MercurialScmProvider.class, MercurialBlameCommand.class);
   }
-
 }

@@ -19,11 +19,6 @@
  */
 package org.sonar.plugins.scm.mercurial;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.sonar.api.batch.scm.BlameLine;
-import org.sonar.api.utils.command.StreamConsumer;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -33,10 +28,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.sonar.api.batch.scm.BlameLine;
+import org.sonar.api.utils.command.StreamConsumer;
+import org.sonar.api.utils.log.Logger;
+import org.sonar.api.utils.log.Loggers;
 
 public class MercurialBlameConsumer implements StreamConsumer {
 
-  private static final Logger LOG = LoggerFactory.getLogger(MercurialBlameConsumer.class);
+  private static final Logger LOG = Loggers.get(MercurialBlameConsumer.class);
 
   private static final String HG_TIMESTAMP_PATTERN = "EEE MMM dd HH:mm:ss yyyy Z";
   private static final String HG_BLAME_PATTERN = "(.*?) (?:<(.*)> )?([0-9a-f]{12}) ([^:]+:[^:]+:[^:]+):.*";
