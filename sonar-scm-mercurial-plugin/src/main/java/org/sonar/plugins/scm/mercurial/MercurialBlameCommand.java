@@ -19,7 +19,6 @@
  */
 package org.sonar.plugins.scm.mercurial;
 
-import com.google.common.annotations.VisibleForTesting;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +27,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.scm.BlameCommand;
@@ -39,10 +36,12 @@ import org.sonar.api.utils.command.Command;
 import org.sonar.api.utils.command.CommandExecutor;
 import org.sonar.api.utils.command.StreamConsumer;
 import org.sonar.api.utils.command.StringStreamConsumer;
+import org.sonar.api.utils.log.Logger;
+import org.sonar.api.utils.log.Loggers;
 
 public class MercurialBlameCommand extends BlameCommand {
 
-  private static final Logger LOG = LoggerFactory.getLogger(MercurialBlameCommand.class);
+  private static final Logger LOG = Loggers.get(MercurialBlameCommand.class);
   private final CommandExecutor commandExecutor;
   private Settings settings;
 
@@ -50,7 +49,6 @@ public class MercurialBlameCommand extends BlameCommand {
     this(CommandExecutor.create(), settings);
   }
 
-  @VisibleForTesting
   MercurialBlameCommand(CommandExecutor commandExecutor, Settings settings) {
     this.commandExecutor = commandExecutor;
     this.settings = settings;

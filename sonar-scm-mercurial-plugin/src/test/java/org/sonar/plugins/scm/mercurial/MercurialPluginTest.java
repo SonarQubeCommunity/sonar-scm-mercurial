@@ -20,6 +20,11 @@
 package org.sonar.plugins.scm.mercurial;
 
 import org.junit.Test;
+import org.sonar.api.Plugin;
+import org.sonar.api.SonarQubeSide;
+import org.sonar.api.SonarRuntime;
+import org.sonar.api.internal.SonarRuntimeImpl;
+import org.sonar.api.utils.Version;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,6 +32,11 @@ public class MercurialPluginTest {
 
   @Test
   public void getExtensions() {
-    assertThat(new MercurialPlugin().getExtensions()).hasSize(2);
+    SonarRuntime runtime = SonarRuntimeImpl.forSonarQube(Version.create(6, 7), SonarQubeSide.SCANNER);
+    Plugin.Context context = new Plugin.Context(runtime);
+
+    new MercurialPlugin().define(context);
+
+    assertThat(context.getExtensions()).hasSize(2);
   }
 }

@@ -12,7 +12,7 @@
   <name>SonarQube :: Plugins :: SCM :: Mercurial</name>
   <version>1.2-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <description>Mercurial SCM Provider.</description>
+  <description>Mercurial SCM Provider</description>
   <url>http://redirect.sonarsource.com/plugins/scmmercurial.html</url>
   <inceptionYear>2014</inceptionYear>
 
@@ -59,52 +59,9 @@
   </ciManagement>
 
   <properties>
-    <sonar.buildVersion>5.0</sonar.buildVersion>
-    <sonar.pluginName>Mercurial</sonar.pluginName>
-    <sonar.pluginClass>org.sonar.plugins.scm.mercurial.MercurialPlugin</sonar.pluginClass>
+    <sonar.buildVersion>6.7</sonar.buildVersion>
     <gitRepositoryName>sonar-scm-mercurial</gitRepositoryName>
   </properties>
-
-  <dependencies>
-    <dependency>
-      <groupId>com.google.code.findbugs</groupId>
-      <artifactId>jsr305</artifactId>
-      <version>3.0.2</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.sonar</groupId>
-      <artifactId>sonar-plugin-api</artifactId>
-      <version>${sonar.buildVersion}</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <!-- unit tests -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.12</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.assertj</groupId>
-      <artifactId>assertj-core</artifactId>
-      <version>3.9.0</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <version>2.13.0</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <version>1.7.10</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
 
   <profiles>
     <profile>
