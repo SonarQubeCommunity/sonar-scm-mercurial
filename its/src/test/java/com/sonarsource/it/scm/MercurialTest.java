@@ -22,27 +22,21 @@ package com.sonarsource.it.scm;
 import com.sonar.orchestrator.Orchestrator;
 import com.sonar.orchestrator.build.MavenBuild;
 import com.sonar.orchestrator.locator.FileLocation;
+import com.sonar.orchestrator.locator.MavenLocation;
 import com.sonar.orchestrator.util.ZipUtils;
-import com.sonar.orchestrator.version.Version;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
-import org.apache.commons.lang3.time.DateUtils;
 import org.assertj.core.data.MapEntry;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.sonar.wsclient.jsonsimple.JSONArray;
@@ -53,47 +47,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class MercurialTest {
 
-  private static final File REPO_DIR = new File("scm-repo");
-
-  private static Version artifactVersion;
-
-  @ClassRule
-  public static TemporaryFolder temp = new TemporaryFolder();
+  @Rule
+  public TemporaryFolder temp = new TemporaryFolder();
 
   @ClassRule
   public static Orchestrator orchestrator = Orchestrator.builderEnv()
+    .setSonarVersion(System.getProperty("sonar.runtimeVersion", "LATEST_RELEASE[6.7]"))
     .addPlugin(FileLocation.byWildcardMavenFilename(new File("../sonar-scm-mercurial-plugin/target"), "sonar-scm-mercurial-plugin-*.jar"))
-    .setOrchestratorProperty("javaVersion", "LATEST_RELEASE")
-    .addPlugin("java")
+    .addPlugin(MavenLocation.of("org.sonarsource.java", "sonar-java-plugin", "LATEST_RELEASE"))
     .build();
-
-  private boolean IS_5_2_OR_MORE = orchestrator.getServer().version().isGreaterThanOrEquals("5.2");
-
-  private static File repoDir;
-
-  @BeforeClass
-  public static void init() throws Exception {
-    repoDir = temp.newFolder();
-  }
-
-  @Before
-  public void cleanup() throws Exception {
-    orchestrator.resetData();
-  }
 
   @Test
   public void testBlame() throws Exception {
-    ZipUtils.unzip(new File(REPO_DIR, "dummy-hg.zip"), repoDir);
-
-    File pom = new File(new File(repoDir, "dummy-hg"), "pom.xml");
+    File projectDir = temp.newFolder();
+    ZipUtils.unzip(new File("scm-repo/dummy-hg.zip"), projectDir);
+    File pom = new File(projectDir, "dummy-hg/pom.xml");
 
     MavenBuild sonar = MavenBuild.create(pom)
-      .setGoals("clean verify sonar:sonar")
-      .setProperty("sonar.junit.reportsPath", "");
-    // Hack for Travis that have Mercurial 2.0.2
-    if (System.getenv("TRAVIS") != null) {
-      sonar.setProperty("sonar.mercurial.considerWhitespaces", "true");
-    }
+      .setGoals("verify sonar:sonar")
+      .setProperty("sonar.scm.disabled", "false");
     orchestrator.executeBuilds(sonar);
 
     assertThat(getScmData("dummy-hg:dummy:src/main/java/org/dummy/Dummy.java"))
@@ -103,24 +75,16 @@ public class MercurialTest {
         MapEntry.entry(3, new LineData("f553ba9f524c", "2012-07-18T18:26:11+0200", "david@gageot.net")));
   }
 
-  private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
   private static final SimpleDateFormat DATETIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
   private class LineData {
+    private final String revision;
+    private final Date date;
+    private final String author;
 
-    final String revision;
-    final Date date;
-    final String author;
-
-    public LineData(String revision, String datetime, String author) throws ParseException {
-      this.revision = IS_5_2_OR_MORE ? revision : null;
-      this.date = IS_5_2_OR_MORE ? DATETIME_FORMAT.parse(datetime) : DateUtils.truncate(DATETIME_FORMAT.parse(datetime), Calendar.DAY_OF_MONTH);
-      this.author = author;
-    }
-
-    public LineData(String date, String author) throws ParseException {
-      this.revision = null;
-      this.date = DATE_FORMAT.parse(date);
+    private LineData(String revision, String datetime, String author) throws ParseException {
+      this.revision = revision;
+      this.date = DATETIME_FORMAT.parse(datetime);
       this.author = author;
     }
 
@@ -141,9 +105,13 @@ public class MercurialTest {
   }
 
   private Map<Integer, LineData> getScmData(String fileKey) throws ParseException {
-
-    Map<Integer, LineData> result = new HashMap<Integer, LineData>();
-    String json = orchestrator.getServer().adminWsClient().get("api/sources/scm", "commits_by_line", "true", "key", fileKey);
+    Map<Integer, LineData> result = new HashMap<>();
+    String json = orchestrator.getServer()
+      .newHttpCall("api/sources/scm")
+      .setParam("commits_by_line", "true")
+      .setParam("key", fileKey)
+      .execute()
+      .getBodyAsString();
     JSONObject obj = (JSONObject) JSONValue.parse(json);
     JSONArray array = (JSONArray) obj.get("scm");
     for (int i = 0; i < array.size(); i++) {
@@ -151,8 +119,7 @@ public class MercurialTest {
       // Time part was added in 5.2
       String dateOrDatetime = (String) item.get(2);
       // Revision was added in 5.2
-      result.put(((Long) item.get(0)).intValue(), IS_5_2_OR_MORE ? new LineData((String) item.get(3),
-        dateOrDatetime, (String) item.get(1)) : new LineData(dateOrDatetime, (String) item.get(1)));
+      result.put(((Long) item.get(0)).intValue(), new LineData((String) item.get(3), dateOrDatetime, (String) item.get(1)));
     }
     return result;
   }
