@@ -12,7 +12,7 @@ addons:
 
 script:
   - hg --version
-  - mvn verify -B -e -V
+  - mvn verify -Pits -B -e -V
 
 cache:
   directories:
