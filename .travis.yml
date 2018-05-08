@@ -12,7 +12,8 @@ addons:
 
 script:
   - hg --version
-  - mvn verify -Pits -B -e -V
+  - mvn verify -Pits -Dsonar.runtimeVersion=DEV -B -e -V
+  - mvn verify -Pits -Dsonar.runtimeVersion=LATEST_RELEASE[6.7] -B -e -V
 
 cache:
   directories:
