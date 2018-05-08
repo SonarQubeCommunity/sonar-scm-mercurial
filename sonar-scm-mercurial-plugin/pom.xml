@@ -11,7 +11,7 @@
   
   <name>SonarQube :: Plugins :: SCM :: Mercurial</name>  
   <packaging>sonar-plugin</packaging>
-  <description>Mercurial SCM Provider.</description>
+  <description>Mercurial SCM Provider</description>
   <url>http://redirect.sonarsource.com/plugins/scmmercurial.html</url>
   <inceptionYear>2014</inceptionYear>
 
