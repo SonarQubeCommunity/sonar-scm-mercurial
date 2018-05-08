@@ -11,5 +11,5 @@ This plugin implements SCM dependent features of SonarQube for [Mercurial](http:
 ## Usage
 Auto-detection will works if there is a .hg folder in the project root directory. Otherwise you can force the provider using -Dsonar.scm.provider=hg.
 
-## Developper informations
+## Developer
 The plugin doesn't use [Hg4j](http://www.hg4j.com/) because it is not available on Maven central.
