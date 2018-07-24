@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.sonarsource.scm.mercurial</groupId>
     <artifactId>scm-mercurial</artifactId>
-    <version>1.1.2-SNAPSHOT</version>
+    <version>1.1.2</version>
   </parent>
 
   <artifactId>sonar-scm-mercurial-plugin</artifactId>
