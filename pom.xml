@@ -10,7 +10,7 @@
   <groupId>org.sonarsource.scm.mercurial</groupId>
   <artifactId>scm-mercurial</artifactId>
   <name>SonarQube :: Plugins :: SCM :: Mercurial</name>
-  <version>1.2-SNAPSHOT</version>
+  <version>1.1.2-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>Mercurial SCM Provider</description>
   <url>http://redirect.sonarsource.com/plugins/scmmercurial.html</url>
