@@ -99,7 +99,7 @@ public class MercurialBlameCommand extends BlameCommand {
       LOG.debug("The mercurial blame command [" + cl.toString() + "] failed: " + stderr.getOutput());
     }
     List<BlameLine> lines = consumer.getLines();
-    if (lines.size() == inputFile.lines() - 1) {
+    if (!lines.isEmpty() && lines.size() == inputFile.lines() - 1) {
       // SONARPLUGINS-3097 Mercurial do not report blame on last empty line
       lines.add(lines.get(lines.size() - 1));
     }

@@ -40,6 +40,7 @@ import org.sonar.api.utils.DateUtils;
 import org.sonar.api.utils.command.CommandExecutor;
 import org.sonar.api.utils.command.StreamConsumer;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
@@ -127,10 +128,32 @@ public class MercurialBlameCommandTest {
     when(input.filesToBlame()).thenReturn(singletonList(inputFile));
     new MercurialBlameCommand(commandExecutor, new MapSettings()).blame(input, result);
     verify(result).blameResult(inputFile,
-      Arrays.asList(new BlameLine().date(DateUtils.parseDateTime("2014-11-04T11:01:10+0100")).revision("d45dafac0d9a").author("julien.henry@sonarsource.com"),
+      Arrays.asList(
+        new BlameLine().date(DateUtils.parseDateTime("2014-11-04T11:01:10+0100")).revision("d45dafac0d9a").author("julien.henry@sonarsource.com"),
         new BlameLine().date(DateUtils.parseDateTime("2014-11-04T11:01:10+0100")).revision("d45dafac0d9a").author("julien.henry@sonarsource.com"),
         new BlameLine().date(DateUtils.parseDateTime("2014-11-04T11:01:10+0100")).revision("d45dafac0d9a").author("julien.henry@sonarsource.com"),
         new BlameLine().date(DateUtils.parseDateTime("2014-11-04T11:01:10+0100")).revision("d45dafac0d9a").author("julien.henry@sonarsource.com")));
+  }
+
+  @Test
+  public void empty_file_has_always_an_empty_last_line() {
+    InputFile inputFile = new TestInputFileBuilder("foo", "src/foo.xoo")
+      .setLines(1)
+      .setModuleBaseDir(baseDir.toPath())
+      .build();
+    fs.add(inputFile);
+
+    BlameOutput result = mock(BlameOutput.class);
+    CommandExecutor commandExecutor = mock(CommandExecutor.class);
+
+    when(commandExecutor.execute(any(), any(), any(), anyLong())).thenAnswer((Answer<Integer>) invocation -> {
+      // Hg doesn't blame last empty line
+      return 0;
+    });
+
+    when(input.filesToBlame()).thenReturn(singletonList(inputFile));
+    new MercurialBlameCommand(commandExecutor, new MapSettings()).blame(input, result);
+    verify(result).blameResult(inputFile, emptyList());
   }
 
   @Test
