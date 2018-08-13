@@ -4,14 +4,14 @@
   <parent>
     <groupId>org.sonarsource.parent</groupId>
     <artifactId>parent</artifactId>
-    <version>44</version>
+    <version>46</version>
     <relativePath />
   </parent>
   <groupId>org.sonarsource.scm.mercurial</groupId>
   <artifactId>scm-mercurial</artifactId>
-  <name>SonarQube :: Plugins :: SCM :: Mercurial</name>
   <version>1.2-SNAPSHOT</version>
   <packaging>pom</packaging>
+  <name>SonarQube :: Plugins :: SCM :: Mercurial</name>  
   <description>Mercurial SCM Provider</description>
   <url>http://redirect.sonarsource.com/plugins/scmmercurial.html</url>
   <inceptionYear>2014</inceptionYear>
@@ -42,25 +42,28 @@
   </modules>
 
   <scm>
-    <connection>scm:git:git@github.com:SonarQubeCommunity/sonar-scm-mercurial.git</connection>
-    <developerConnection>scm:git:git@github.com:SonarQubeCommunity/sonar-scm-mercurial.git</developerConnection>
-    <url>https://github.com/SonarQubeCommunity/sonar-scm-mercurial</url>
+    <connection>scm:git:git@github.com:SonarSource/sonar-scm-mercurial.git</connection>
+    <developerConnection>scm:git:git@github.com:SonarSource/sonar-scm-mercurial.git</developerConnection>
+    <url>https://github.com/SonarSource/sonar-scm-mercurial</url>
     <tag>HEAD</tag>
   </scm>
   
   <issueManagement>
-    <system>GitHub Issues</system>
-    <url>https://github.com/SonarQubeCommunity/sonar-scm-mercurial/issues</url>
+    <system>jira</system>
+    <url>https://jira.sonarsource.com/browse/SONARHG</url>
   </issueManagement>
   
   <ciManagement>
     <system>Travis</system>
-    <url>https://travis-ci.org/SonarQubeCommunity/sonar-scm-mercurial/</url>
+    <url>https://travis-ci.org/SonarSource/sonar-scm-mercurial/</url>
   </ciManagement>
 
   <properties>
     <sonar.buildVersion>6.7</sonar.buildVersion>
     <gitRepositoryName>sonar-scm-mercurial</gitRepositoryName>
+
+    <!-- Release: enable publication to Bintray -->
+    <artifactsToPublish>${project.groupId}:sonar-scm-mercurial-plugin:jar</artifactsToPublish>
   </properties>
 
   <profiles>
