@@ -22,7 +22,6 @@ package org.sonar.plugins.scm.mercurial;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -69,9 +68,7 @@ public class MercurialBlameCommandTest {
   }
 
   @Test
-  public void testParsingOfOutput() throws IOException {
-    File source = new File(baseDir, "src/foo.xoo");
-    FileUtils.write(source, "sample content");
+  public void testParsingOfOutput() {
     InputFile inputFile = new TestInputFileBuilder("foo", "src/foo.xoo")
       .setLines(3)
       .setModuleBaseDir(baseDir.toPath())
@@ -104,9 +101,7 @@ public class MercurialBlameCommandTest {
   }
 
   @Test
-  public void testAddMissingLastLine() throws IOException {
-    File source = new File(baseDir, "src/foo.xoo");
-    FileUtils.write(source, "sample content");
+  public void testAddMissingLastLine() {
     InputFile inputFile = new TestInputFileBuilder("foo", "src/foo.xoo")
       .setLines(4)
       .setModuleBaseDir(baseDir.toPath())
@@ -157,9 +152,7 @@ public class MercurialBlameCommandTest {
   }
 
   @Test
-  public void shouldNotFailOnFileUncommitted() throws IOException {
-    File source = new File(baseDir, "src/foo.xoo");
-    FileUtils.write(source, "sample content");
+  public void shouldNotFailOnFileUncommitted() {
     InputFile inputFile = new TestInputFileBuilder("foo", "src/foo.xoo")
       .setModuleBaseDir(baseDir.toPath())
       .build();
