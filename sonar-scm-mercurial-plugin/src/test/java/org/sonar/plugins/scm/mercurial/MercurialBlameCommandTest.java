@@ -28,6 +28,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.ArgumentCaptor;
 import org.mockito.stubbing.Answer;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.fs.internal.DefaultFileSystem;
@@ -37,10 +38,12 @@ import org.sonar.api.batch.scm.BlameCommand.BlameOutput;
 import org.sonar.api.batch.scm.BlameLine;
 import org.sonar.api.config.internal.MapSettings;
 import org.sonar.api.utils.DateUtils;
+import org.sonar.api.utils.command.Command;
 import org.sonar.api.utils.command.CommandExecutor;
 import org.sonar.api.utils.command.StreamConsumer;
 
 import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.mock;
@@ -48,6 +51,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class MercurialBlameCommandTest {
+
+  private static final String MALICIOUS_FILENAME = "--config=alias.blame=!touch xxx";
 
   @Rule
   public TemporaryFolder temp = new TemporaryFolder();
@@ -157,6 +162,41 @@ public class MercurialBlameCommandTest {
     // TODO assert log contains
     // "The mercurial blame command [hg blame -w -v --user --date --changeset src/foo.xoo] failed: abandon : src/foo.xoo: no such file in
     // rev 000000000000"
+  }
+
+  @Test
+  public void shouldProcessMaliciousFileBlockingAttack() throws IOException {
+    File source = new File(baseDir, MALICIOUS_FILENAME);
+    FileUtils.write(source, "sample content");
+    InputFile inputFile = new TestInputFileBuilder("foo", MALICIOUS_FILENAME)
+      .setLines(3)
+      .setModuleBaseDir(baseDir.toPath())
+      .build();
+    fs.add(inputFile);
+
+    BlameOutput result = mock(BlameOutput.class);
+    CommandExecutor commandExecutor = mock(CommandExecutor.class);
+
+    ArgumentCaptor<Command> commandCaptor = ArgumentCaptor.forClass(Command.class);
+    when(commandExecutor.execute(commandCaptor.capture(), any(), any(), anyLong())).thenAnswer((Answer<Integer>) invocation -> {
+      StreamConsumer outConsumer = (StreamConsumer) invocation.getArguments()[1];
+      outConsumer.consumeLine("John Something <john.something@sonarsource.com> 447af27e2bc1 Tue Nov 04 11:01:10 2020 +0100: foo");
+      return 0;
+    });
+
+    when(input.filesToBlame()).thenReturn(singletonList(inputFile));
+
+    new MercurialBlameCommand(commandExecutor, new MapSettings())
+      .blame(input, result);
+
+    assertThat(commandCaptor.getValue().getArguments())
+      .containsExactly("blame", "-w", "-v", "--user", "--date", "--changeset", "--", MALICIOUS_FILENAME);
+
+    verify(result).blameResult(inputFile,
+      singletonList(new BlameLine()
+        .date(DateUtils.parseDateTime("2020-11-04T11:01:10+0100"))
+        .revision("447af27e2bc1")
+        .author("john.something@sonarsource.com")));
   }
 
 }

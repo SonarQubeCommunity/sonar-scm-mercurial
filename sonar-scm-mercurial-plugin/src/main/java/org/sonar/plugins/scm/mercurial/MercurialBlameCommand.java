@@ -128,6 +128,9 @@ public class MercurialBlameCommand extends BlameCommand {
     cl.addArgument("--date");
     // list the global revision number
     cl.addArgument("--changeset");
+    // Make filename safe for usage with the "hg" command
+    // See Guideline 10 at https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html
+    cl.addArgument("--");
     cl.addArgument(filename);
     return cl;
   }
