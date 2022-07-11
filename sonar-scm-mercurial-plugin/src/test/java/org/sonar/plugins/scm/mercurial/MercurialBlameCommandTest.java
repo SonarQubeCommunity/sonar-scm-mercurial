@@ -22,7 +22,6 @@ package org.sonar.plugins.scm.mercurial;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,6 +41,7 @@ import org.sonar.api.utils.command.Command;
 import org.sonar.api.utils.command.CommandExecutor;
 import org.sonar.api.utils.command.StreamConsumer;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Matchers.any;
@@ -73,9 +73,7 @@ public class MercurialBlameCommandTest {
   }
 
   @Test
-  public void testParsingOfOutput() throws IOException {
-    File source = new File(baseDir, "src/foo.xoo");
-    FileUtils.write(source, "sample content");
+  public void testParsingOfOutput() {
     InputFile inputFile = new TestInputFileBuilder("foo", "src/foo.xoo")
       .setLines(3)
       .setModuleBaseDir(baseDir.toPath())
@@ -108,9 +106,7 @@ public class MercurialBlameCommandTest {
   }
 
   @Test
-  public void testAddMissingLastLine() throws IOException {
-    File source = new File(baseDir, "src/foo.xoo");
-    FileUtils.write(source, "sample content");
+  public void testAddMissingLastLine() {
     InputFile inputFile = new TestInputFileBuilder("foo", "src/foo.xoo")
       .setLines(4)
       .setModuleBaseDir(baseDir.toPath())
@@ -132,16 +128,36 @@ public class MercurialBlameCommandTest {
     when(input.filesToBlame()).thenReturn(singletonList(inputFile));
     new MercurialBlameCommand(commandExecutor, new MapSettings()).blame(input, result);
     verify(result).blameResult(inputFile,
-      Arrays.asList(new BlameLine().date(DateUtils.parseDateTime("2014-11-04T11:01:10+0100")).revision("d45dafac0d9a").author("julien.henry@sonarsource.com"),
+      Arrays.asList(
+        new BlameLine().date(DateUtils.parseDateTime("2014-11-04T11:01:10+0100")).revision("d45dafac0d9a").author("julien.henry@sonarsource.com"),
         new BlameLine().date(DateUtils.parseDateTime("2014-11-04T11:01:10+0100")).revision("d45dafac0d9a").author("julien.henry@sonarsource.com"),
         new BlameLine().date(DateUtils.parseDateTime("2014-11-04T11:01:10+0100")).revision("d45dafac0d9a").author("julien.henry@sonarsource.com"),
         new BlameLine().date(DateUtils.parseDateTime("2014-11-04T11:01:10+0100")).revision("d45dafac0d9a").author("julien.henry@sonarsource.com")));
   }
 
   @Test
-  public void shouldNotFailOnFileUncommitted() throws IOException {
-    File source = new File(baseDir, "src/foo.xoo");
-    FileUtils.write(source, "sample content");
+  public void empty_file_has_always_an_empty_last_line() {
+    InputFile inputFile = new TestInputFileBuilder("foo", "src/foo.xoo")
+      .setLines(1)
+      .setModuleBaseDir(baseDir.toPath())
+      .build();
+    fs.add(inputFile);
+
+    BlameOutput result = mock(BlameOutput.class);
+    CommandExecutor commandExecutor = mock(CommandExecutor.class);
+
+    when(commandExecutor.execute(any(), any(), any(), anyLong())).thenAnswer((Answer<Integer>) invocation -> {
+      // Hg doesn't blame last empty line
+      return 0;
+    });
+
+    when(input.filesToBlame()).thenReturn(singletonList(inputFile));
+    new MercurialBlameCommand(commandExecutor, new MapSettings()).blame(input, result);
+    verify(result).blameResult(inputFile, emptyList());
+  }
+
+  @Test
+  public void shouldNotFailOnFileUncommitted() {
     InputFile inputFile = new TestInputFileBuilder("foo", "src/foo.xoo")
       .setModuleBaseDir(baseDir.toPath())
       .build();
