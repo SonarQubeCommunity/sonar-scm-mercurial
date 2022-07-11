@@ -1,5 +1,5 @@
 # SonarQube Mercurial plugin
-[![Build Status](https://travis-ci.org/SonarQubeCommunity/sonar-scm-mercurial.svg)](https://travis-ci.org/SonarQubeCommunity/sonar-scm-mercurial)
+[![Build Status](https://travis-ci.org/SonarSource/sonar-scm-mercurial.svg)](https://travis-ci.org/SonarQubeCommunity/sonar-scm-mercurial)
 
 ## Description
 This plugin implements SCM dependent features of SonarQube for [Mercurial](http://www.mercurial-scm.org/) projects.
