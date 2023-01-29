@@ -189,6 +189,7 @@ public class MercurialBlameCommandTest {
     new MercurialBlameCommand(commandExecutor, new MapSettings())
       .blame(input, result);
 
+    assertThat(commandCaptor.getValue().getDirectory()).isEqualTo(baseDir);
     assertThat(commandCaptor.getValue().getArguments())
       .containsExactly("blame", "-w", "-v", "--user", "--date", "--changeset", "--", MALICIOUS_FILENAME);
 
@@ -197,6 +198,82 @@ public class MercurialBlameCommandTest {
         .date(DateUtils.parseDateTime("2020-11-04T11:01:10+0100"))
         .revision("447af27e2bc1")
         .author("john.something@sonarsource.com")));
+  }
+
+  @Test
+  public void takeHgDirFromSubrepository() throws IOException {
+    // In main repository
+    {
+      File mainrepoSource = new File(baseDir, "src/mainrepoSource.xoo");
+      FileUtils.write(mainrepoSource, "sample content");
+      InputFile inputFile = new TestInputFileBuilder("mainrepoSource", "src/mainrepoSource.xoo")
+          .setModuleBaseDir(baseDir.toPath())
+          .build();
+      fs.add(inputFile);
+
+      BlameOutput result = mock(BlameOutput.class);
+      CommandExecutor commandExecutor = mock(CommandExecutor.class);
+      
+      ArgumentCaptor<Command> commandCaptor = ArgumentCaptor.forClass(Command.class);
+      when(commandExecutor.execute(commandCaptor.capture(), any(), any(), anyLong())).thenAnswer((Answer<Integer>) invocation -> {
+        StreamConsumer outConsumer = (StreamConsumer) invocation.getArguments()[1];
+        outConsumer.consumeLine("John Something <john.something@sonarsource.com> 447af27e2bc1 Tue Nov 04 11:01:10 2020 +0100: foo");
+        return 0;
+      });
+
+      when(input.filesToBlame()).thenReturn(singletonList(inputFile));
+      new MercurialBlameCommand(commandExecutor, new MapSettings())
+        .blame(input, result);
+
+      assertThat(commandCaptor.getValue().getDirectory()).isEqualTo(baseDir);
+      assertThat(commandCaptor.getValue().getArguments())
+        .containsExactly("blame", "-w", "-v", "--user", "--date", "--changeset", "--", "src/mainrepoSource.xoo");
+      
+      verify(result).blameResult(inputFile,
+        singletonList(new BlameLine()
+          .date(DateUtils.parseDateTime("2020-11-04T11:01:10+0100"))
+          .revision("447af27e2bc1")
+          .author("john.something@sonarsource.com")));
+    }
+    
+    // In sub repository
+    {
+      File subrepoDir = new File(baseDir, "subrepo");
+      assertThat(subrepoDir.mkdir()).isTrue();
+      File subrepoHgDir = new File(subrepoDir, ".hg");
+      assertThat(subrepoHgDir.mkdir()).isTrue();
+      File subrepoSource = new File(subrepoDir, "src/subrepoSource.xoo");
+      FileUtils.write(subrepoSource, "sample content");
+      InputFile inputFile = new TestInputFileBuilder("bar", "subrepo/src/subrepoSource.xoo")
+          .setModuleBaseDir(baseDir.toPath())
+          .build();
+      fs.add(inputFile);
+
+      BlameOutput result = mock(BlameOutput.class);
+      CommandExecutor commandExecutor = mock(CommandExecutor.class);
+  
+      ArgumentCaptor<Command> commandCaptor = ArgumentCaptor.forClass(Command.class);
+      when(commandExecutor.execute(commandCaptor.capture(), any(), any(), anyLong())).thenAnswer((Answer<Integer>) invocation -> {
+        StreamConsumer outConsumer = (StreamConsumer) invocation.getArguments()[1];
+        outConsumer.consumeLine("John Something <john.something@sonarsource.com> 447af27e2bc1 Tue Nov 04 11:01:10 2020 +0100: foo");
+        return 0;
+      });
+
+      when(input.filesToBlame()).thenReturn(singletonList(inputFile));
+    
+      new MercurialBlameCommand(commandExecutor, new MapSettings())
+        .blame(input, result);
+
+      assertThat(commandCaptor.getValue().getDirectory()).isEqualTo(subrepoDir);
+      assertThat(commandCaptor.getValue().getArguments())
+        .containsExactly("blame", "-w", "-v", "--user", "--date", "--changeset", "--", "src/subrepoSource.xoo");
+    
+      verify(result).blameResult(inputFile,
+        singletonList(new BlameLine()
+          .date(DateUtils.parseDateTime("2020-11-04T11:01:10+0100"))
+          .revision("447af27e2bc1")
+          .author("john.something@sonarsource.com")));
+    }
   }
 
 }

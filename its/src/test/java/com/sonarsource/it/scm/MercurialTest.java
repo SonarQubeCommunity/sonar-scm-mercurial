@@ -75,6 +75,27 @@ public class MercurialTest {
         MapEntry.entry(3, new LineData("f553ba9f524c", "2012-07-18T18:26:11+0200", "david@gageot.net")));
   }
 
+  @Test
+  public void testBlameSubrepo() throws Exception {
+    File projectDir = temp.newFolder();
+    ZipUtils.unzip(new File("scm-repo/dummy-hg-with-subrepo.zip"), projectDir);
+    File fileInRepo = new File(projectDir, "dummy-hg-with-subrepo/fileinrepo.txt");
+    File fileInSubRepo = new File(projectDir, "dummy-hg-with-subrepo/subrepo/fileinsubrepo.txt");
+    MavenBuild sonar = MavenBuild.create(fileInRepo)
+      .setGoals("verify sonar:sonar")
+      .setProperty("sonar.scm.disabled", "false");
+    orchestrator.executeBuilds(sonar);
+    assertThat(getScmData("dummy-hg-with-subrepo:dummy:fileinrepo.txt"))
+      .contains(
+        MapEntry.entry(0, new LineData("6db77db9dbc4", "2021-10-02 13:45:42+0200", "koenpoppe")),
+        MapEntry.entry(2, new LineData("1c43854ced78", "2021-10-02 13:46:33+0200", "koenpoppe")));
+    assertThat(getScmData("dummy-hg-with-subrepo:dummy:subrepo/fileinsubrepo.txt"))
+      .contains(
+        MapEntry.entry(0, new LineData("ba3299cdfa0e", "2021-10-02 13:40:29+0200", "koenpoppe")),
+        MapEntry.entry(1, new LineData("73172c209d54", "2021-10-02 13:40:42+0200", "koenpoppe")),
+        MapEntry.entry(2, new LineData("f5825590563b", "2021-10-02 13:41:07+0200", "koenpoppe")));
+  }
+
   private static final SimpleDateFormat DATETIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
   private class LineData {

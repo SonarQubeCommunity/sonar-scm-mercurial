@@ -20,6 +20,7 @@
 package org.sonar.plugins.scm.mercurial;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -112,8 +113,21 @@ public class MercurialBlameCommand extends BlameCommand {
   }
 
   private Command createCommandLine(File workingDirectory, String filename) {
+    // Determine root repo, i.e., where the .hg directory is
+    Path workingPath = workingDirectory.toPath();
+    Path filePath = new File(workingDirectory, filename).toPath();
+    Path repoRootPath = filePath.getParent();
+    while (!repoRootPath.equals(workingPath)) {
+      File hgDir = new File(repoRootPath.toFile(), ".hg");
+      if (hgDir.exists()) {
+        break;
+      }
+      repoRootPath = repoRootPath.getParent();
+    }
+    String filePathInRepo = repoRootPath.relativize(filePath).toString();
+    
     Command cl = Command.create("hg");
-    cl.setDirectory(workingDirectory);
+    cl.setDirectory(repoRootPath.toFile());
     cl.addArgument("blame");
     // Hack to support Mercurial prior to 2.1
     if (!settings.getBoolean("sonar.mercurial.considerWhitespaces")) {
@@ -131,7 +145,7 @@ public class MercurialBlameCommand extends BlameCommand {
     // Make filename safe for usage with the "hg" command
     // See Guideline 10 at https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html
     cl.addArgument("--");
-    cl.addArgument(filename);
+    cl.addArgument(filePathInRepo);
     return cl;
   }
 
